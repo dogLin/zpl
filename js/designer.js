@@ -178,22 +178,25 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 	})
 	// 
 		.on("mousedown", function () {
-			debugger
 			self.dragStartPosition = self.canvas.RelativeMouse(event);
 			self.dragLastPosition = self.dragStartPosition;
 
+			// 判断是否添加元素
 			if (self.newObject) {
 				// Create new object.
 				self.elements[self.currentLayer++] = new self.newObject(self.dragStartPosition.x, self.dragStartPosition.y, 1, 1);
+				// 拖拽动作为8？
 				self.dragAction = 8;
+				// 如果是添加新的元素，添加完后左边的添加栏的样式需改变
 				self.activeElement = self.elements[self.currentLayer - 1];
 				self.newObjectController.button.removeClass("designerToolbarButtonActive");
 				self.newObject = null;
 				self.newObjectController = null;
 			}
 			else {
+				// 拖拽工作重置为0
 				self.dragAction = 0;
-
+				// 设置激活元素
 				self.setActiveElement();
 
 				if (self.activeElement) {
@@ -314,12 +317,14 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 			}
 		});
 
+	// 添加子元素
 	this.addObject = function (object) {
 		this.elements[this.currentLayer++] = object;
 		this.activeElement = this.elements[this.currentLayer - 1];
 		this.updateCanvas();
 	}
 
+	// 删除激活元素
 	this.deleteActiveElement = function () {
 		if (this.activeElement) {
 			for (var i = 0; i < this.currentLayer; i++) {
@@ -331,6 +336,7 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 		}
 	}
 
+	// 设置激活元素
 	this.setActiveElement = function () {
 		var coordinates = this.canvas.RelativeMouse(event);
 		if (!this.activeElement || this.getHandle(coordinates) == 0) {
@@ -366,7 +372,9 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 		var topEdge = coords.y > this.activeElement.y - 5 && coords.y < this.activeElement.y + 5;
 		var bottomEdge = coords.y > this.activeElement.y + this.activeElement.getHeight() - 5 && coords.y < this.activeElement.y + this.activeElement.getHeight() + 5;
 
+		// 垂直击中
 		var verticalHit = coords.y > this.activeElement.y && coords.y < this.activeElement.y + this.activeElement.getHeight();
+		// 水平击中
 		var horizontalHit = coords.x > this.activeElement.x && coords.x < this.activeElement.x + this.activeElement.getWidth();
 
 		if (leftEdge && topEdge)
@@ -389,11 +397,13 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 		return result;
 	}
 
+	// 移动激活元素
 	this.move = function (x, y) {
 		this.activeElement.x = x;
 		this.activeElement.y = y;
 	}
 
+	// 调整激活元素的大小
 	this.resize = function (xchange, ychange) {
 		switch (this.dragAction) {
 			case 1: // Top Left
@@ -455,6 +465,7 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 		}
 	}
 
+	// 垂直方向
 	this.swapActionVertical = function () {
 		switch (this.dragAction) {
 			case 1:
@@ -478,6 +489,7 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 		}
 	}
 
+	// 水平方向
 	this.swapActionHorizontal = function () {
 		switch (this.dragAction) {
 			case 1:
@@ -501,6 +513,7 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 		}
 	}
 
+	// 右边激活元素的属性框的更新
 	this.update = function () {
 		this.propertyInspector.update(this.activeElement);
 	}
@@ -510,6 +523,7 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 
 		//this.drawingContext.globalCompositeOperation = "source-over";
 
+		// 画白色实心长方形
 		this.drawingContext.fillStyle = "#FFFFFF";
 		this.drawingContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -517,6 +531,7 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 		//this.drawingContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 		// Draw the boundary.
+		// 用红色线画长方形(边界)
 		this.drawingContext.strokeStyle = "#FF0000";
 		this.drawingContext.lineWidth = 2;
 		this.drawingContext.strokeRect(this.labelX, this.labelY, this.labelWidth, this.labelHeight);
@@ -539,6 +554,7 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 			this.activeElement.drawActive(this.drawingContext);
 	}
 
+	// 生成zpl
 	this.generateZPL = function () {
 		var data = "^XA\r\n" +
 			"^CFd0,10,18\r\n" +
@@ -559,7 +575,6 @@ com.logicpartners.labelDesigner = function (canvasid, labelWidth, labelHeight) {
 
 		data += "^PQ1\r\n" +
 			"^XZ\r\n";
-
 		console.log(bufferData + data);
 		return { "data": bufferData, "zpl": data };
 	}

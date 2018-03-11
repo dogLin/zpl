@@ -7,12 +7,16 @@ com.logicpartners.propertyInspector = function(designer, canvas) {
 	this.canvas = canvas;
 	this.canvasElement = $(canvas);
 	this.labelDesigner = designer;
+	// 激活元素
 	this.activeElement = null;
+	// 激活元素属性
 	this.propertyNodes = {};
+	// 最外曾的rect对象
 	this.boundingBox = null;
 	var self = this;
 
 	// Create the property window.
+	// 在标签设计画布后面添加属性框
 	this.propertyInspector = $('<div></div>')
 			.addClass("designerUtilityWindow")
 			.css({
@@ -28,6 +32,7 @@ com.logicpartners.propertyInspector = function(designer, canvas) {
 	}
 
 
+	// 添加属性框试图,并且高度可拉伸 
 	this.propertyViewContainer = $('<div></div>')
 			.addClass("designerPropertyContainer")
 			.resizable({
@@ -37,6 +42,7 @@ com.logicpartners.propertyInspector = function(designer, canvas) {
 			})
 			.appendTo(this.propertyInspector);
 
+	// 添加标题
 	this.titleBar = $('<div>Property Inspector</div>')
 			.addClass("designerPropertyTitle")
 			.prependTo(this.propertyInspector)
@@ -44,15 +50,18 @@ com.logicpartners.propertyInspector = function(designer, canvas) {
 				self.propertyViewContainer.toggle();
 			});
 
+	// 添加属性内容
 	this.propertyView = $('<div></div>')
 			.addClass("designerPropertyContent")
 			.appendTo(this.propertyViewContainer);
 
+	// 更新
 	this.update = function(activeElement) {
 		var self = this;
 		var getType = {};
 		var keys = [];
 		
+		// 如果激活元素没变 将元素非只读元素赋值给试图
 		if (this.activeElement == activeElement) {
 			for (var key in activeElement) {
 				if (!activeElement.readonly || key != "readonly" && $.inArray(key, activeElement.readonly) == -1) {
